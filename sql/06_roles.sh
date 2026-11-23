@@ -8,6 +8,6 @@ GRANT USAGE ON SCHEMA core TO da_reader, ds_user;
 GRANT SELECT ON ALL TABLES IN SCHEMA core TO da_reader, ds_user;
 ALTER DEFAULT PRIVILEGES IN SCHEMA core GRANT SELECT ON TABLES TO da_reader, ds_user;
 
--- الـ DS بيكتب نتايج التحليل بس
+-- DS writes analysis results only
 GRANT UPDATE ON core.reviews_fact, core.dim_h3_cells TO ds_user;
 SQL

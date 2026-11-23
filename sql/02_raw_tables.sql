@@ -2,13 +2,13 @@ CREATE TABLE raw.osm_places_raw (
     id          BIGSERIAL PRIMARY KEY,
     area_code   TEXT        NOT NULL,
     fetched_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
-    payload     JSONB       NOT NULL          -- عنصر واحد من رد Overpass
+    payload     JSONB       NOT NULL          -- one element from the Overpass response
 );
 
 CREATE TABLE raw.reviews_raw (
     id          BIGSERIAL PRIMARY KEY,
     source      TEXT        NOT NULL,         -- rapidapi_local_business, ...
-    source_ref  TEXT,                         -- business_id عند المصدر
+    source_ref  TEXT,                         -- business_id at the source
     fetched_at  TIMESTAMPTZ NOT NULL DEFAULT now(),
     payload     JSONB       NOT NULL
 );

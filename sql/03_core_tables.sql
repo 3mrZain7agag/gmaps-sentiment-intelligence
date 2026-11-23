@@ -12,7 +12,7 @@ CREATE TABLE core.dim_h3_cells (
     area_id         INT REFERENCES core.dim_areas(area_id),
     geom            GEOMETRY(Polygon, 4326) NOT NULL,
     cell_area_km2   NUMERIC,
-    -- المقاييس (بتتملى في الأسبوع 3)
+    -- Metrics (populated in week 3)
     place_count     INT,
     density         NUMERIC,       -- D
     demand_score    NUMERIC,       -- Sdemand
@@ -54,7 +54,7 @@ CREATE TABLE core.fact_place_snapshots (
     UNIQUE (place_id, snapshot_date, source)
 );
 
--- ملاحظة خصوصية: مفيش عمود لاسم كاتب الريفيو (قرار المشروع)
+-- Privacy note: no column for the reviewer's name (project decision)
 CREATE TABLE core.reviews_fact (
     review_id       BIGSERIAL PRIMARY KEY,
     place_id        BIGINT NOT NULL REFERENCES core.places_dim(place_id),

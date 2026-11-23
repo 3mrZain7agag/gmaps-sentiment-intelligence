@@ -1,4 +1,4 @@
--- الإحداثيات تقريبية ومحتاجة مراجعة بصرية (ST_MakeEnvelope: west, south, east, north)
+-- Approximate coordinates, need visual review (ST_MakeEnvelope: west, south, east, north)
 INSERT INTO core.dim_areas (area_code, name_en, name_ar, bbox) VALUES
  ('new_cairo',   'New Cairo / Fifth Settlement', 'التجمع الخامس / القاهرة الجديدة', ST_MakeEnvelope(31.38, 29.98, 31.52, 30.06, 4326)),
  ('nasr_city',   'Nasr City',                    'مدينة نصر',                       ST_MakeEnvelope(31.28, 30.04, 31.38, 30.10, 4326)),
