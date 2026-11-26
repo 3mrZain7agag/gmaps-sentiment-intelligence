@@ -63,6 +63,8 @@ PostgreSQL with the PostGIS extension.
 | `reviews_fact` | Review text, language, rating, sentiment label, and topic |
 | Views (e.g. `latest_places_v`) | Ready-made views that simplify work for the analysts and data scientists |
 
+Schemas: `raw` (payloads exactly as fetched, DE only), `staging` (e.g. `v_reviews_flat`, the flattened API reviews), and `core` (clean tables, the contract with the team). Reviewer names and profiles are never stored.
+
 ## Analysis
 
 - **Sentiment analysis**: a model (such as the Arabic-specialized MARBERT) classifies every review as positive, neutral, or negative. The challenge is that reviews mix Modern Standard Arabic, dialects, Franco-Arabic, and English.
@@ -108,6 +110,7 @@ PostgreSQL with the PostGIS extension.
 ```
 .
 ├── docs/             # Project documentation and decisions
+├── etl/              # Small export jobs (e.g. gold-set sample from the database to CSV)
 ├── ingestion/        # Scripts that pull data from OpenStreetMap and RapidAPI
 ├── notebooks/        # Exploration and NLP experiments
 ├── sql/              # Database schema and transformation queries
@@ -116,7 +119,7 @@ PostgreSQL with the PostGIS extension.
 └── README.md
 ```
 
-## Getting Started
+## Getting Started (local database, optional)
 
 ```bash
 # 1. Clone the repo
@@ -129,6 +132,39 @@ cp .env.example .env
 # 3. Start the database (PostgreSQL + PostGIS)
 docker compose up -d
 ```
+
+## Connect to the shared database (Supabase)
+
+The team works on one shared PostgreSQL + PostGIS database on Supabase. You get your own **role** and password privately from the team leader; passwords are never committed.
+
+1. `cp .env.example .env`
+2. Fill the `POSTGRES_*` values. Use the **Session pooler** details (Supabase dashboard > Connect). The direct connection does not work on the free plan (IPv6 only).
+   - `POSTGRES_USER` has the form `<role>.<project-ref>`, for example `da_reader.<project-ref>` (not just `da_reader`).
+   - `POSTGRES_PASSWORD` is your role's password.
+3. Connect with any client (DBeaver, psql, VS Code, Python):
+
+```python
+import os, psycopg2
+from dotenv import load_dotenv
+
+load_dotenv()
+conn = psycopg2.connect(
+    host=os.environ["POSTGRES_HOST"], port=os.environ.get("POSTGRES_PORT", "5432"),
+    dbname=os.environ["POSTGRES_DB"], user=os.environ["POSTGRES_USER"],
+    password=os.environ["POSTGRES_PASSWORD"], sslmode="require",
+)
+```
+
+| Role | Who | Access |
+|---|---|---|
+| `da_reader` | Data Analysts | Read-only on `core.*` and `staging.v_reviews_flat` |
+| `ds_user` | Data Scientist | Same as above, plus UPDATE on `core.reviews_fact` and `core.dim_h3_cells` (analysis results only) |
+
+The `raw` schema is not accessible to the team. Never ask for, or use, the project's `postgres` password or the `service_role` key.
+
+### Gold set
+
+The gold set (about 200 manually labeled reviews used to measure sentiment model accuracy) lives in a Google Sheet, outside the database, so it can be edited freely. The sample is exported with `python etl/export_gold_set.py` (read-only, writes to the git-ignored `data/` folder). Review text is never committed to the repo.
 
 ## Team Workflow
 
